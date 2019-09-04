@@ -30,12 +30,19 @@ contract Lottery {
         return true;
     }
 
-    function getWinningNumbers()
+    function drawWinningNumbers()
         public
-        returns(string winningNumbers)
     {
         winningNumbers = "1,24,43,11,19";
-        return winningNumbers;
+    }
+
+    function getWinningNumbers()
+        public
+        view
+        returns(string numbers)
+    {
+        numbers = winningNumbers;
+        return numbers;
     }
 
 }

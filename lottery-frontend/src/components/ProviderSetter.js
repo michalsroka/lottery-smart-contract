@@ -19,12 +19,16 @@ const ProviderSetter = props => {
       LotteryContract.setProvider(web3Provider.currentProvider);
       LotteryContract.defaults({ from: web3Provider.eth.defaultAccount });
 
-      LotteryContract.deployed().then((lotteryContract) => {
-          const price = 100000000000000000;
-          lotteryContract.bet("1,21,43,3,23", {from: defaultAccount, value: price});
-          console.log(lotteryContract.getWinningNumbers());
+      LotteryContract.deployed().then(lotteryContract => {
+        const price = 100000000000000000;
+        // lotteryContract.bet("1,21,43,3,23", {
+        //   from: defaultAccount,
+        //   value: price
+        // });
+        // lotteryContract.drawWinningNumbers();
+        console.log("Winning numbers:");
+        console.log(lotteryContract.getWinningNumbers());
       });
-
     });
 
     /* make web3Provider available to your entire app now */
