@@ -13,15 +13,15 @@ const ProviderSetter = props => {
     ethereum.enable().then(account => {
       const defaultAccount = account[0];
       web3Provider.eth.defaultAccount = defaultAccount;
-      console.log("Default account: " + account);
+      console.log("Default account: " + account[0]);
 
       const LotteryContract = TruffleContract(Lottery);
       LotteryContract.setProvider(web3Provider.currentProvider);
       LotteryContract.defaults({ from: web3Provider.eth.defaultAccount });
 
       LotteryContract.deployed().then((lotteryContract) => {
-          let price = 100000000000000000;
-          lotteryContract.bet();
+          const price = 100000000000000000;
+          lotteryContract.bet({from: defaultAccount, value: price});
       });
 
     });

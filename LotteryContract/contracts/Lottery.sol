@@ -10,6 +10,7 @@ contract Lottery {
 
     function bet()
         public
+        condition(msg.value == (0.1 ether))
         payable
     {
         better = msg.sender;
