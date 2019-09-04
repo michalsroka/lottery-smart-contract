@@ -21,7 +21,8 @@ const ProviderSetter = props => {
 
       LotteryContract.deployed().then((lotteryContract) => {
           const price = 100000000000000000;
-          lotteryContract.bet({from: defaultAccount, value: price});
+          lotteryContract.bet("1,21,43,3,23", {from: defaultAccount, value: price});
+          console.log(lotteryContract.getWinningNumbers());
       });
 
     });

@@ -10,5 +10,9 @@ TODO:
 
 2. front-end:
   - page where user with metamask can input the numbers and send a bet
+  - if external timer not implemented: periodical call from the contract creator account to release new winning numbers
   - (optional) the clock to the next number draw
   - (optional) "check previous result" button which pops up a component informing you about the numbers and about the winner (e.g. 0x9b...a)
+
+3. service:
+  - timer for releasing new winning numbers
