@@ -25,17 +25,26 @@ contract Lottery {
         state = State.Ongoing;
     }
 
-    modifier condition(bool _condition) {
+    modifier condition(bool _condition)
+    {
         require(_condition);
         _;
     }
 
-    modifier isCreator() {
+    modifier isCreator()
+    {
         require(msg.sender == creator);
         _;
     }
 
-    modifier isInState(State _state) {
+    modifier isNotCreator()
+    {
+        require(msg.sender != creator);
+        _;
+    }
+
+    modifier isInState(State _state)
+    {
         require(state == _state);
         _;
     }
@@ -57,6 +66,7 @@ contract Lottery {
 
     function drawWinningNumbers()
         public
+        isCreator
     {
         winningNumbers = "1,11,19,24,43"; // numbers need to be sorted
     }
@@ -71,6 +81,7 @@ contract Lottery {
 
     function collectWinners()
         public
+        isCreator
     {
         for (uint i=0; i<betters.length; i++)
         {
@@ -84,17 +95,14 @@ contract Lottery {
     function payout()
         public
         payable
+        isCreator
     {
-        // uint256 prize = calculatePrize();
-        // for (uint i=0; i<winners.length; i++)
-        // {
-        //     winners[uint(i)].transfer(prize);
-        // }
-        if (address(this).balance > 0.1 ether)
+        uint256 prize = calculatePrize();
+        for (uint i=0; i<winners.length; i++)
         {
-            msg.sender.call.value(0.05 * 1 ether)("");
+            winners[uint(i)].transfer(prize);
         }
-        state = State.Ongoing;
+        delete winners;
     }
 
     function calculatePrize()
