@@ -20,14 +20,24 @@ const ProviderSetter = props => {
       LotteryContract.defaults({ from: web3Provider.eth.defaultAccount });
 
       LotteryContract.deployed().then(lotteryContract => {
-        const price = 100000000000000000;
-        // lotteryContract.bet("1,21,43,3,23", {
+        // const price = 100000000000000000;
+        // lotteryContract.bet("1,11,19,24,43", {
         //   from: defaultAccount,
         //   value: price
         // });
+
         // lotteryContract.drawWinningNumbers();
-        console.log("Winning numbers:");
-        console.log(lotteryContract.getWinningNumbers());
+        // console.log("Winning numbers:");
+        // lotteryContract.getWinningNumbers.call().then((result) => {
+        //   console.log(result);
+        // });
+
+        // lotteryContract.collectWinners();
+        // lotteryContract.getWinners.call().then((result) => {
+        //   console.log(result);
+        // });
+        
+        lotteryContract.payout({from: defaultAccount});
       });
     });
 

@@ -1,19 +1,42 @@
-pragma solidity ^0.4.22;
+pragma solidity ^0.4.24;
 
 contract Lottery {
+    address public creator;
     address public better;
-    string winningNumbers;
+    string public winningNumbers;
+    uint256 bank;
 
     struct Better {
         address betterAddress;
         string bettedNumbers;
     }
 
+    enum State { Initialized, Ongoing, Finished }
+    State state;
+
     Better[] betters;
     address[] winners;
 
+    function Lottery()
+        public
+        payable
+    {
+        creator = msg.sender;
+        state = State.Ongoing;
+    }
+
     modifier condition(bool _condition) {
         require(_condition);
+        _;
+    }
+
+    modifier isCreator() {
+        require(msg.sender == creator);
+        _;
+    }
+
+    modifier isInState(State _state) {
+        require(state == _state);
         _;
     }
 
@@ -21,28 +44,88 @@ contract Lottery {
         public
         condition(msg.value == (0.1 ether))
         payable
-        returns(bool succeeded)
+        returns(bool)
     {
         Better storage _currentBetter;
         _currentBetter.betterAddress = msg.sender;
         _currentBetter.bettedNumbers = _betNumbers;
         betters.push(_currentBetter);
+        bank = bank + msg.value;
+        state = State.Ongoing;
         return true;
     }
 
     function drawWinningNumbers()
         public
     {
-        winningNumbers = "1,24,43,11,19";
+        winningNumbers = "1,11,19,24,43"; // numbers need to be sorted
     }
+
+    function isWinner(Better better)
+        internal
+        returns (bool)
+    {
+        string memory bettedNumbers = better.bettedNumbers;
+        return keccak256(bettedNumbers) == keccak256(winningNumbers);
+    }
+
+    function collectWinners()
+        public
+    {
+        for (uint i=0; i<betters.length; i++)
+        {
+            if (isWinner(betters[uint(i)]))
+            {
+                winners.push(betters[uint(i)].betterAddress);
+            }
+        }
+    }
+
+    function payout()
+        public
+        payable
+    {
+        // uint256 prize = calculatePrize();
+        // for (uint i=0; i<winners.length; i++)
+        // {
+        //     winners[uint(i)].transfer(prize);
+        // }
+        if (address(this).balance > 0.1 ether)
+        {
+            msg.sender.call.value(0.05 * 1 ether)("");
+        }
+        state = State.Ongoing;
+    }
+
+    function calculatePrize()
+        internal
+        returns(uint256)
+    {
+        uint256 prizePool = bank * uint256(9) / uint256(10);
+        return prizePool / uint256(winners.length);
+    }
+
+    // function isSenderAWinner()
+    //     public
+    //     returns (bool)
+    // {
+
+    // }
 
     function getWinningNumbers()
         public
         view
-        returns(string numbers)
+        returns(string memory)
     {
-        numbers = winningNumbers;
-        return numbers;
+        return winningNumbers;
+    }
+
+    function getWinners()
+        public
+        view
+        returns(address[] memory)
+    {
+        return winners;
     }
 
 }
