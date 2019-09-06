@@ -36,7 +36,7 @@ const ProviderSetter = props => {
         // lotteryContract.getWinners.call().then((result) => {
         //   console.log(result);
         // });
-        
+
         // lotteryContract.payout({from: defaultAccount});
       });
     });

@@ -1,0 +1,9 @@
+.main-frame {
+    width: 70%;
+    height: 600px;
+    background-color: rgba(27, 126, 255, 0.725);
+    margin: 100px;
+    padding: 20px;
+    border-radius: 10px;
+    border: solid 5px rgb(21, 65, 148);
+}
