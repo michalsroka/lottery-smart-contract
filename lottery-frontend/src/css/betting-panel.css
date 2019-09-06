@@ -7,3 +7,15 @@
     border-radius: 10px;
     border: solid 5px rgb(21, 65, 148);
 }
+
+.bet-button {
+    padding: 5px;
+    margin: 20px;
+    border-radius: 4px;
+    border: solid 2px rgb(68, 124, 71);
+    background-color: rgb(56, 151, 64);
+}
+
+.bet-button:hover {
+    background-color: rgb(68, 124, 71);
+}

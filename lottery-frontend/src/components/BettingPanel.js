@@ -1,13 +1,16 @@
 import React from "react";
-import "../css/betting-panel.css";
+
 import NumberForm from "./NumberForm";
 import ResultInfo from "./ResultInfo";
+
+import "../css/betting-panel.css";
+
 
 const BettingPanel = props => {
   return (
     <div className="main-frame">
       <NumberForm />
-      <button onClick>bet</button>
+      <div className="bet-button" onClick>bet</div>
       <ResultInfo show={false} />
     </div>
   );
