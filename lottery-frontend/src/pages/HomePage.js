@@ -28,8 +28,31 @@ class HomePage extends Component {
   }
 
   areBettedNumbersValid() {
-    return ((this.state.value0 !== null && this.state.value1 !== null && this.state.value2 !== null && this.state.value3 !== null && this.state.value4 !== null) &&
-     (1 <= this.state.value0 <= 49 && 1 <= this.state.value1 <= 49 && 1 <= this.state.value2 <= 49 && 1 <= this.state.value3 <= 49 && 1 <= this.state.value4 <= 49));
+    return (
+      this.state.value0 !== null &&
+      this.state.value1 !== null &&
+      this.state.value2 !== null &&
+      this.state.value3 !== null &&
+      this.state.value4 !== null &&
+      (1 <= this.state.value0 <= 49 &&
+        1 <= this.state.value1 <= 49 &&
+        1 <= this.state.value2 <= 49 &&
+        1 <= this.state.value3 <= 49 &&
+        1 <= this.state.value4 <= 49)
+    );
+  }
+
+  parseBettedNumbers() {
+    let bettedNumbersArray = [
+      this.state.value0,
+      this.state.value1,
+      this.state.value2,
+      this.state.value3,
+      this.state.value4
+    ];
+    const sortFunction = (a, b) => a - b;
+    bettedNumbersArray.sort(sortFunction);
+    return bettedNumbersArray.join(",");
   }
 
   bet() {
@@ -47,7 +70,8 @@ class HomePage extends Component {
 
         lotteryContract.deployed().then(lotteryContract => {
           const price = 100000000000000000;
-          lotteryContract.bet("1,11,19,24,43", {
+          const bettingNumbersString = this.parseBettedNumbers();
+          lotteryContract.bet(bettingNumbersString, {
             from: defaultAccount,
             value: price
           });
@@ -55,7 +79,7 @@ class HomePage extends Component {
       });
     } else {
       if (!this.areBettedNumbersValid()) {
-        console.log("Provided numbers are not valid")
+        console.log("Provided numbers are not valid");
       } else {
         console.log("Provider not available!");
       }
@@ -69,7 +93,9 @@ class HomePage extends Component {
         <MyNavbar />
         <BettingPanel
           onClickBet={this.bet}
-          handleChange={(event, componentName) => this.handleChange(event, componentName)}
+          handleChange={(event, componentName) =>
+            this.handleChange(event, componentName)
+          }
           name0="value0"
           name1="value1"
           name2="value2"
@@ -81,7 +107,6 @@ class HomePage extends Component {
           value3={this.state.value3}
           value4={this.state.value4}
         />
-        {/* <ProviderSetter /> */}
       </div>
     );
   }
