@@ -1,7 +1,6 @@
 import React from "react";
 
 import NumberForm from "./NumberForm";
-import ResultInfo from "./ResultInfo";
 
 import "../css/betting-panel.css";
 
@@ -45,8 +44,10 @@ const BettingPanel = props => {
       <div className="result-button" onClick={() => props.onClickCheck()}>
         check results
       </div>
-      {resultsAvailabilityData}
-      {resultData}
+      <div className="result-data">
+        {resultsAvailabilityData}
+        {resultData}
+      </div>
     </div>
   );
 };

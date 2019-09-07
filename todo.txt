@@ -2,6 +2,11 @@ Lottery
 
 TODO:
 1. lottery contract:
+  - fix flow: when paid out, winners, betters, winning numbers DELETED
+
+
+Archive0:
+1. lottery contract:
   - create contract with receiving eth function
   - scheduled request for numbers (possible that flask service needs to provide timer service to tell if it's the time to draw numbers)
   - draw numbers after the time is up (note that parsing json is not neccessary: sorted strings can be compared or flask can do the job)

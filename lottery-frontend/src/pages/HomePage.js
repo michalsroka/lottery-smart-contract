@@ -1,8 +1,5 @@
 import React, { Component } from "react";
-import ProviderSetter from "../components/ProviderSetter";
 import BettingPanel from "../components/BettingPanel";
-import { Navbar, Nav, Button, ButtonToolbar } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import MyNavbar from "../components/MyNavbar";
 import Web3 from "web3";
 import Lottery from "../contracts_abi/Lottery.json";
@@ -164,7 +161,7 @@ class HomePage extends Component {
         <BettingPanel
           onClickBet={this.bet}
           onClickCheck={this.checkResults}
-          areResultsAvailable={this.state.areResultsAvailable}
+          areResultsAvailable={this.state.resultsAvailable}
           hasBetterWon={this.state.hasBetterWon}
           handleChange={(event, componentName) =>
             this.handleChange(event, componentName)
