@@ -17,10 +17,15 @@ class HomePage extends Component {
       value1: null,
       value2: null,
       value3: null,
-      value4: null
+      value4: null,
+      resultsAvailable: null,
+      hasBetterWon: null
     };
     this.bet = this.bet.bind(this);
     this.areBettedNumbersValid = this.areBettedNumbersValid.bind(this);
+    this.areResultsAvailable = this.areResultsAvailable.bind(this);
+    this.hasBetterWon = this.hasBetterWon.bind(this);
+    this.checkResults = this.checkResults.bind(this);
   }
 
   handleChange(event, componentName) {
@@ -34,11 +39,16 @@ class HomePage extends Component {
       this.state.value2 !== null &&
       this.state.value3 !== null &&
       this.state.value4 !== null &&
-      (1 <= this.state.value0 <= 49 &&
-        1 <= this.state.value1 <= 49 &&
-        1 <= this.state.value2 <= 49 &&
-        1 <= this.state.value3 <= 49 &&
-        1 <= this.state.value4 <= 49)
+      (1 <= this.state.value0 &&
+        this.state.value0 <= 49 &&
+        1 <= this.state.value1 &&
+        this.state.value1 <= 49 &&
+        1 <= this.state.value2 &&
+        this.state.value2 <= 49 &&
+        1 <= this.state.value3 &&
+        this.state.value3 <= 49 &&
+        1 <= this.state.value4 &&
+        this.state.value4 <= 49)
     );
   }
 
@@ -64,11 +74,11 @@ class HomePage extends Component {
       ethereum.enable().then(account => {
         const defaultAccount = account[0];
         web3Provider.eth.defaultAccount = defaultAccount;
-        const lotteryContract = TruffleContract(Lottery);
-        lotteryContract.setProvider(web3Provider.currentProvider);
-        lotteryContract.defaults({ from: web3Provider.eth.defaultAccount });
+        const LotteryContract = TruffleContract(Lottery);
+        LotteryContract.setProvider(web3Provider.currentProvider);
+        LotteryContract.defaults({ from: web3Provider.eth.defaultAccount });
 
-        lotteryContract.deployed().then(lotteryContract => {
+        LotteryContract.deployed().then(lotteryContract => {
           const price = 100000000000000000;
           const bettingNumbersString = this.parseBettedNumbers();
           lotteryContract.bet(bettingNumbersString, {
@@ -86,6 +96,66 @@ class HomePage extends Component {
     }
   }
 
+  areResultsAvailable() {
+    if (window.ethereum) {
+      const ethereum = window.ethereum;
+      const web3Provider = new Web3(ethereum);
+
+      // Use this only when executing actions (transaction)
+      ethereum.enable().then(account => {
+        const defaultAccount = account[0];
+        web3Provider.eth.defaultAccount = defaultAccount;
+        const LotteryContract = TruffleContract(Lottery);
+        LotteryContract.setProvider(web3Provider.currentProvider);
+        LotteryContract.defaults({ from: web3Provider.eth.defaultAccount });
+
+        LotteryContract.deployed().then(lotteryContract => {
+          // lotteryContract.getWinningNumbers();
+          lotteryContract.getWinningNumbers.call().then(result => {
+            // console.log(result);
+            this.setState({
+              ["resultsAvailable"]: result === "" ? false : true
+            });
+          });
+        });
+      });
+    } else {
+      console.log("Provider not available!");
+    }
+  }
+
+  hasBetterWon() {
+    if (window.ethereum) {
+      const ethereum = window.ethereum;
+      const web3Provider = new Web3(ethereum);
+
+      // Use this only when executing actions (transaction)
+      ethereum.enable().then(account => {
+        const defaultAccount = account[0];
+        web3Provider.eth.defaultAccount = defaultAccount;
+        const lotteryContract = TruffleContract(Lottery);
+        lotteryContract.setProvider(web3Provider.currentProvider);
+        lotteryContract.defaults({ from: web3Provider.eth.defaultAccount });
+
+        lotteryContract.deployed().then(lotteryContract => {
+          lotteryContract.getWinners.call().then(result => {
+            console.log(result);
+            this.setState({
+              ["hasBetterWon"]: result.includes(defaultAccount) ? true : false
+            });
+          });
+        });
+      });
+    } else {
+      console.log("Provider not available!");
+    }
+  }
+
+  checkResults() {
+    this.areResultsAvailable();
+    this.hasBetterWon();
+  }
+
   render() {
     console.log(this.state);
     return (
@@ -93,6 +163,9 @@ class HomePage extends Component {
         <MyNavbar />
         <BettingPanel
           onClickBet={this.bet}
+          onClickCheck={this.checkResults}
+          areResultsAvailable={this.state.areResultsAvailable}
+          hasBetterWon={this.state.hasBetterWon}
           handleChange={(event, componentName) =>
             this.handleChange(event, componentName)
           }
