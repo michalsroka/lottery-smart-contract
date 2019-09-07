@@ -11,7 +11,7 @@ contract Lottery {
         string bettedNumbers;
     }
 
-    enum State { Initialized, Ongoing, Finished }
+    enum State { Ongoing, Finished }
     State state;
 
     Better[] betters;
@@ -31,18 +31,6 @@ contract Lottery {
         _;
     }
 
-    modifier isCreator()
-    {
-        require(msg.sender == creator);
-        _;
-    }
-
-    modifier isNotCreator()
-    {
-        require(msg.sender != creator);
-        _;
-    }
-
     modifier isInState(State _state)
     {
         require(state == _state);
@@ -52,36 +40,36 @@ contract Lottery {
     function bet(string _betNumbers)
         public
         condition(msg.value == (0.1 ether))
+        condition(state == State.Ongoing)
         payable
-        returns(bool)
     {
+        if (state != State.Ongoing) {
+            revert("Betting only allowed in the Finished state");
+        }
         Better storage _currentBetter;
         _currentBetter.betterAddress = msg.sender;
         _currentBetter.bettedNumbers = _betNumbers;
         betters.push(_currentBetter);
         bank = bank + msg.value;
         state = State.Ongoing;
-        return true;
     }
 
     function drawWinningNumbers()
         public
-        isCreator
     {
+        if (msg.sender != creator) {
+            revert("Drawing numbers only allowed for the owner");
+        }
+        if (state != State.Ongoing) {
+            revert("Drawing numbers only allowed in the Ongoing state");
+        }
         winningNumbers = "1,11,19,24,43"; // numbers need to be sorted
-    }
-
-    function isWinner(Better better)
-        internal
-        returns (bool)
-    {
-        string memory bettedNumbers = better.bettedNumbers;
-        return keccak256(bettedNumbers) == keccak256(winningNumbers);
+        state = State.Finished;
+        collectWinners();
     }
 
     function collectWinners()
-        public
-        isCreator
+        internal
     {
         for (uint i=0; i<betters.length; i++)
         {
@@ -92,17 +80,34 @@ contract Lottery {
         }
     }
 
+    function isWinner(Better better)
+        internal
+        returns (bool)
+    {
+        string memory bettedNumbers = better.bettedNumbers;
+        return keccak256(bettedNumbers) == keccak256(winningNumbers);
+    }
+
     function payout()
         public
         payable
-        isCreator
     {
+        if(msg.sender != creator) {
+            revert("Payout call only allowed for the owner");
+        }
+        if (state != State.Finished) {
+            revert("Payout call only allowed in the Finished state");
+        }
         uint256 prize = calculatePrize();
         for (uint i=0; i<winners.length; i++)
         {
             winners[uint(i)].transfer(prize);
         }
         delete winners;
+        delete betters;
+        delete winningNumbers;
+        bank = uint256(0);
+        state = State.Ongoing;
     }
 
     function calculatePrize()
@@ -112,13 +117,6 @@ contract Lottery {
         uint256 prizePool = bank * uint256(9) / uint256(10);
         return prizePool / uint256(winners.length);
     }
-
-    // function isSenderAWinner()
-    //     public
-    //     returns (bool)
-    // {
-
-    // }
 
     function getWinningNumbers()
         public
@@ -134,6 +132,18 @@ contract Lottery {
         returns(address[] memory)
     {
         return winners;
+    }
+
+    function getState()
+        public
+        view
+        returns(string memory)
+    {
+        if (state == State.Ongoing) {
+            return "Ongoing";
+        } else {
+            return "Finished";
+        }
     }
 
 }

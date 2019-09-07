@@ -10,7 +10,7 @@ class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      value0: 0,
+      value0: null,
       value1: null,
       value2: null,
       value3: null,
@@ -110,6 +110,7 @@ class HomePage extends Component {
           // lotteryContract.getWinningNumbers();
           lotteryContract.getWinningNumbers.call().then(result => {
             // console.log(result);
+            console.log("winning nums: " + result);
             this.setState({
               ["resultsAvailable"]: result === "" ? false : true
             });
@@ -136,9 +137,19 @@ class HomePage extends Component {
 
         lotteryContract.deployed().then(lotteryContract => {
           lotteryContract.getWinners.call().then(result => {
-            console.log(result);
+            console.log("current address: " + defaultAccount);
+            if (result !== null) {
+              for (let i = 0; i < result.length; i++) {
+                result[i] = result[i].toLowerCase();
+              }
+            }
+            console.log("winners: " + result);
+            console.log(result.includes(defaultAccount.toLowerCase()));
             this.setState({
-              ["hasBetterWon"]: result.includes(defaultAccount) ? true : false
+              ["hasBetterWon"]:
+                result !== null && result.includes(defaultAccount.toLowerCase())
+                  ? true
+                  : false
             });
           });
         });
@@ -150,10 +161,37 @@ class HomePage extends Component {
 
   checkResults() {
     this.areResultsAvailable();
-    this.hasBetterWon();
+    if (this.state.resultsAvailable) {
+      this.hasBetterWon();
+    }
+  }
+
+  checkContractState() {
+    if (window.ethereum) {
+      const ethereum = window.ethereum;
+      const web3Provider = new Web3(ethereum);
+
+      // Use this only when executing actions (transaction)
+      ethereum.enable().then(account => {
+        const defaultAccount = account[0];
+        web3Provider.eth.defaultAccount = defaultAccount;
+        const lotteryContract = TruffleContract(Lottery);
+        lotteryContract.setProvider(web3Provider.currentProvider);
+        lotteryContract.defaults({ from: web3Provider.eth.defaultAccount });
+
+        lotteryContract.deployed().then(lotteryContract => {
+          lotteryContract.getState.call().then(result => {
+            console.log("state: " + result);
+          });
+        });
+      });
+    } else {
+      console.log("Provider not available!");
+    }
   }
 
   render() {
+    this.checkContractState();
     console.log(this.state);
     return (
       <div className="main">
