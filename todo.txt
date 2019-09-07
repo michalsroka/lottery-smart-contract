@@ -1,6 +1,13 @@
 Lottery
 
+-------------------------------------------------------------
 TODO:
+
+-------------------------------------------------------------
+
+
+-------------------------------------------------------------
+Archive1:
 1. lottery contract:
   - fix flow: when paid out, winners, betters, winning numbers DELETED
 
@@ -21,3 +28,4 @@ Archive0:
 
 3. service:
   - timer for releasing new winning numbers
+-------------------------------------------------------------

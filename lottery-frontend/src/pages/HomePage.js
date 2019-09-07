@@ -144,7 +144,6 @@ class HomePage extends Component {
               }
             }
             console.log("winners: " + result);
-            console.log(result.includes(defaultAccount.toLowerCase()));
             this.setState({
               ["hasBetterWon"]:
                 result !== null && result.includes(defaultAccount.toLowerCase())

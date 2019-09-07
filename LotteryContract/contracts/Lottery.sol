@@ -98,10 +98,12 @@ contract Lottery {
         if (state != State.Finished) {
             revert("Payout call only allowed in the Finished state");
         }
-        uint256 prize = calculatePrize();
-        for (uint i=0; i<winners.length; i++)
-        {
-            winners[uint(i)].transfer(prize);
+        if (winners.length > 0) {
+            uint256 prize = calculatePrize();
+            for (uint i=0; i<winners.length; i++)
+            {
+                winners[uint(i)].transfer(prize);
+            }
         }
         delete winners;
         delete betters;
